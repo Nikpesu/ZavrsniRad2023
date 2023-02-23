@@ -86,6 +86,9 @@ void updateWeather()
     Serial.println("WiFi Disconnected");
   }
 }      
+void notFound(AsyncWebServerRequest *request) {
+    request->send(404, "text/html", "<!doctype html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\" /></head> <body>Stranica nije pronađena!<br> <a href=\"/\"> <input id=\"posaljitelj\" type=\"submit\" value=\"Početna stranica!\" style=\"height: 4em;  width: 10em;\"></a></body></html>");
+}
 void httpSetup()
 {
 
@@ -195,8 +198,9 @@ void httpSetup()
     tmp+="</table>";
     }
     request->send(200,"text/html", tmp);
+      
   });
-
+  HTTP.onNotFound(notFound);
   HTTP.begin();
   
 } 

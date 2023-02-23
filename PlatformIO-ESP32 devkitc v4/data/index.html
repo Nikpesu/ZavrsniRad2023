@@ -65,7 +65,7 @@ a{
     </head>
     <body>
 
-        <form id="forma" action="/get" style="left: 25%; position: absolute; width: 50%;">
+        <form id="forma" action="/get" method="get" style="left: 25%; position: absolute; width: 50%;">
 
               <div style="display: flex; flex-direction: column;">
                 
@@ -73,6 +73,9 @@ a{
           Digitalni sat 
         </h1>
         <h3 style="margin-top: 0px;">(Završni rad Niko Pešut)</h3>
+                <section style="background-color:rgba(128, 128, 128, 0.2); border-color: gray;">
+                  <h3 style="margin: 0px;">Stavke koje ne mijenjate se neće postaviti</h3>
+                </section>
                 <section>
                   <h2 style="margin-bottom: 2px; ">Lokacija</h2>
                   <h5 style="margin-top: 2px;">(od lokacije se automatski uzima vremenska zona, datum, vrijeme...)</h1>
@@ -188,6 +191,7 @@ a{
           form.submit();
         }
         );
+
 
     </script>
 </html>

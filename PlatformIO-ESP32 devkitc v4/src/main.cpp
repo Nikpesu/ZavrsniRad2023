@@ -30,7 +30,7 @@ void setup() {
   
   rtc.begin();
   refreshTime();
-  myWIFI.begin(SSID.c_str(), PASS.c_str(), APssid.c_str(), APssid.c_str(), APpass.c_str(), "4.3.2.1");
+  myWIFI.begin(SSID.c_str(), PASS.c_str(), APssid.c_str(), APssid.c_str(), APpass.c_str(), "192.168.4.1");
   if (WiFi.status() == WL_CONNECTED)  {
     //mySSDP.begin(SSDP_Name.c_str(), "000000001", nName.c_str(), nVersion.c_str(), "NikoPesut", "https://kikirikiserver.hopto.org:60001"); Serial.println(F("Start init SSDP"));
     Serial.println(F("Start SSDP"));   //Run SSDP
@@ -44,12 +44,13 @@ void setup() {
   {   
     clearAllLayers();  
     indexedLayerZ1.drawString(0,0,1,"Wi-Fi neuspjeh!");
-    typeText(0,7,(String)("SSID:\n"+APssid+"\nIP-HOTSPOT:\n4.3.2.1"),&boja2[0]);
+    typeText(0,7,(String)("SSID:\n"+APssid+"\nIP-HOTSPOT:\n192.168.4.1"),&boja2[0]);
   }
   taskManager.scheduleFixedRate(300,refreshAPIs,TIME_SECONDS);//svakih 5 minuta
   taskManager.scheduleFixedRate(1,refreshTime,TIME_SECONDS);//svaku 1 sekundi
   taskManager.scheduleFixedRate(100,displayDraw,TIME_MILLIS);//svakih 0.1 sekundi
-  taskManager.scheduleFixedRate(15,recconectWifi,TIME_SECONDS);//svakih 10 minuta
+  taskManager.scheduleFixedRate(99, gumbiSense, TIME_MILLIS);//svakih 0.1 sekundi
+  taskManager.scheduleFixedRate(15,recconectWifi,TIME_SECONDS);//svakih 15 sekundi
   swapAllLayerBuffers();
   httpSetup();
   delay(10000);

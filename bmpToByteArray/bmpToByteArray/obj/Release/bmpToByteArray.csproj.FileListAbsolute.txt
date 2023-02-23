@@ -1,0 +1,11 @@
+F:\Backup\old\ZavrsniRad\bmpToByteArray\bmpToByteArray\bin\Release\bmpToByteArray.exe.config
+F:\Backup\old\ZavrsniRad\bmpToByteArray\bmpToByteArray\bin\Release\bmpToByteArray.exe
+F:\Backup\old\ZavrsniRad\bmpToByteArray\bmpToByteArray\bin\Release\bmpToByteArray.pdb
+F:\Backup\old\ZavrsniRad\bmpToByteArray\bmpToByteArray\obj\Release\bmpToByteArray.csproj.AssemblyReference.cache
+F:\Backup\old\ZavrsniRad\bmpToByteArray\bmpToByteArray\obj\Release\bmpToByteArray.csproj.SuggestedBindingRedirects.cache
+F:\Backup\old\ZavrsniRad\bmpToByteArray\bmpToByteArray\obj\Release\bmpToByteArray.Form1.resources
+F:\Backup\old\ZavrsniRad\bmpToByteArray\bmpToByteArray\obj\Release\bmpToByteArray.Properties.Resources.resources
+F:\Backup\old\ZavrsniRad\bmpToByteArray\bmpToByteArray\obj\Release\bmpToByteArray.csproj.GenerateResource.cache
+F:\Backup\old\ZavrsniRad\bmpToByteArray\bmpToByteArray\obj\Release\bmpToByteArray.csproj.CoreCompileInputs.cache
+F:\Backup\old\ZavrsniRad\bmpToByteArray\bmpToByteArray\obj\Release\bmpToByteArray.exe
+F:\Backup\old\ZavrsniRad\bmpToByteArray\bmpToByteArray\obj\Release\bmpToByteArray.pdb

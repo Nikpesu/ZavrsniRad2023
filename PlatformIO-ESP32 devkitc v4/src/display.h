@@ -173,7 +173,7 @@ bool gumbPress(uint8_t ulaz)
 
 void gumbiSense()
 {
-  if(zadnje_stisnuto<millis()-500)
+  if(++zadnje_stisnuto>2) //svakih cca 0.5s
   {
     gumbStanje=0;
   }
@@ -212,14 +212,14 @@ void gumbiSense()
       if(WiFi.status() == WL_CONNECTED) 
         typeText(0,7,(String)("SSID:\n"+(String)myWIFI.getNameSSID()+"\nIP-WiFi:\n"+myWIFI.getDevStatusIP().substring(9)),&boja2[0]);
       else 
-        typeText(0,7,(String)("SSID:\n"+APssid+"\nIP-HOTSPOT:\n4.3.2.1"),&boja2[0]);
+        typeText(0,7,(String)("SSID:\n"+APssid+"\nIP-HOTSPOT:\n192.168.4.1"),&boja2[0]);
       swapAllLayerBuffers();
       delay(5000);
     }
-    zadnje_stisnuto=millis();
+    zadnje_stisnuto=0;
   }
   if(saveStanje==1)
-    if(zadnje_stisnuto+2000>millis() )
+    if(zadnje_stisnuto>50 ) //nakon cca 10s
     {
       saveStanje=0;
       
@@ -230,7 +230,6 @@ void gumbiSense()
 
 void displayDraw()
 {
-  gumbiSense();
   matrix.setBrightness(svjetlina);
   clearAllLayerBuffers();
   if(stateID==1)
@@ -249,13 +248,15 @@ void displayDraw()
   {
     drawClock(4,1,2, &boja1[0]);
     drawDaytimeLine(0,22,64,23,(sat+minuta/60.0),50);
-    typeTextNoNl(0,25, "Datum.mp4",&boja2[0]);
+    String datum=(String)rtc.now().day()+"."+(String)rtc.now().month()+"."+(String)rtc.now().year()+".";
+    typeTextNoNl((16-datum.length())/2.0*4,25, datum,&boja2[0]);
 
   }
   else if(stateID==3)
   {
     drawClock(4,1,2, &boja1[0]);
-    typeTextNoNl(0,25, "Datum.mp4",&boja2[0]);
+    String datum=(String)rtc.now().day()+"."+(String)rtc.now().month()+"."+(String)rtc.now().year()+".";
+    typeTextNoNl((16-datum.length())/2.0*4,25, datum,&boja2[0]);
   }
   else if(stateID==4)
   {
