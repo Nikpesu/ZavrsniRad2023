@@ -7,7 +7,7 @@ void recconectWifi();
 
 void recconectWifi()
 {
-  if(WiFi.status()!=WL_CONNECTED) 
+  if(WiFi.isConnected()==0) 
     myWIFI.reconectWIFI();
 }
 

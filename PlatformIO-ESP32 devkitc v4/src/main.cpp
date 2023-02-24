@@ -47,10 +47,10 @@ void setup() {
     typeText(0,7,(String)("SSID:\n"+APssid+"\nIP-HOTSPOT:\n192.168.4.1"),&boja2[0]);
   }
   taskManager.scheduleFixedRate(300,refreshAPIs,TIME_SECONDS);//svakih 5 minuta
+  taskManager.scheduleFixedRate(15,recconectWifi,TIME_SECONDS);//svakih 15 sekundi
   taskManager.scheduleFixedRate(1,refreshTime,TIME_SECONDS);//svaku 1 sekundi
   taskManager.scheduleFixedRate(100,displayDraw,TIME_MILLIS);//svakih 0.1 sekundi
   taskManager.scheduleFixedRate(99, gumbiSense, TIME_MILLIS);//svakih 0.1 sekundi
-  taskManager.scheduleFixedRate(15,recconectWifi,TIME_SECONDS);//svakih 15 sekundi
   swapAllLayerBuffers();
   httpSetup();
   delay(10000);

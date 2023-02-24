@@ -12,31 +12,31 @@
 #include "NetCrtESP.h"
 #include <RTClib.h>
 #include <Wire.h>
+#include <cstring>
+#include <ArduinoJson.h> 
+#include <TaskManagerIO.h>
+#include <ADS1115.h>
 //#include <TimeLib.h>
 //#include <Timezone.h>
 //#include "ESPTimeFunc.h"
 //#include "time.h"
-#include <cstring>
-#include <ArduinoJson.h> 
 //#include "ssdpAWS.h"
-#include <TaskManagerIO.h>
-#include <ADS1115.h>
 
 
 /************************JSON_Variables******************/
 String filePath = "/myConf.json"; //File for config
 String jsonConfig = "{}";
 String SSID="", PASS="";
-uint8_t stateID=0; 
+uint8_t stateID=4; 
 //String mqttPass = "";
 //String mqttUsername = "";
 //String mqttIP = "";
 String APssid = "SatZavrsniNiko";
 String APpass = "";
-uint8_t boja1[3],boja2[3],boja3[3], svjetlina=128; 
+uint8_t boja1[3]={255,255,255},boja2[3]={128,64,128},boja3[3]={64,64,128}, svjetlina=128; 
 float lat=0, lng=0;
-String timeApiKey=""; //MCD644HWLRP5
-String weatherApiKey=""; //2f940c078e7a96ecf846d11bba2cbdc7
+String timeApiKey="x"; //MCD644HWLRP5
+String weatherApiKey="x"; //2f940c078e7a96ecf846d11bba2cbdc7
 
 
 /************************Gumbi***************************/
