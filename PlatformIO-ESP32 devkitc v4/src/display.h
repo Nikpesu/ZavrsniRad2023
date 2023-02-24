@@ -269,9 +269,9 @@ void displayDraw()
     if(-(int)statusTrenutniPomak>(int)(4*statusTrenutno.length())) {statusTrenutniPomak=kMatrixWidth;}
       // Serial.println(xda);
     if(WiFi.status() == WL_CONNECTED) 
-      backgroundLayer.drawFastHLine(15,48,31,{0,32,64});
+      backgroundLayer.drawFastHLine(15,48,31,{0,64,128});
     else 
-      backgroundLayer.drawFastHLine(15,48,31,{64,32,0});
+      backgroundLayer.drawFastHLine(15,48,31,{128,64,0});
   }
   swapAllLayerBuffers();
 }
