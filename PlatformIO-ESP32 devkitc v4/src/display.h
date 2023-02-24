@@ -7,7 +7,6 @@ void drawDaytimeLine(int x1, int y1, int x2, int y2, float sat, int povecanje);
 void typeTextNoNl(int x, int y, String text, uint8_t *boje);
 void drawLetterNoNl(int x, int y, char znak, uint8_t *boje);
 void refreshTime();
-void prognozaCrtanje(bool humtemp=1);
 void swapAllLayerBuffers();
 void clearAllLayerBuffers();
 bool gumbPress(uint8_t ulaz);

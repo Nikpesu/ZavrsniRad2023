@@ -61,7 +61,7 @@ AsyncWebServer HTTP(80);
 
 String SSDP_Name = "sussyESP"; 
 const String nName = "NikoSat"; 
-const String nVersion = "v0.23beta";
+const String nVersion = "v0.6.1";
 
 
 

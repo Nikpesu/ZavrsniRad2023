@@ -3,7 +3,6 @@ void httpSetup();
 void updateWeather();
 void refreshAPIs();
 void updateTime();
-void updateWeather();
 void recconectWifi();
 
 void recconectWifi()
@@ -100,6 +99,7 @@ void httpSetup()
     delay(1500);
     ESP.restart();
   });
+
   HTTP.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
     String tmp;
     bool changedAny=0;
@@ -179,7 +179,7 @@ void httpSetup()
     tmp+="<br><br><br> <form action=\"/reset\"> <a href=\"/\"> <input id=\"posaljitelj\" type=\"submit\" value=\"Restart Sata? (tako se wifi ponovo spaja na novi)\" style=\"height: 3em;  width: 99%;\"></a></form><br> </div><body>";
 
     //debug!
-    if(1==1)
+    if(1==0)
     {
     tmp+="<table>";
     tmp+="<tr><th>Varijabla</th><th>Vrijednost</th></tr>";

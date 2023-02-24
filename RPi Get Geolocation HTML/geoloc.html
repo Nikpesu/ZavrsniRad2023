@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<style>
+  html {
+    background-color: #DBDBDB;
+    color: #376DAB;
+    font-family: monospace;
+    font-weight: bolder;
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid #C14953;
+  }
+
+  input,
+  select {
+    height: 1.5em;
+    padding: auto;
+    margin: 0.1em;
+    color: #376DAB;
+    font-family: monospace;
+    background-color: lightblue;
+    border: 2px transparent solid;
+    border-radius: 0.2em;
+    font-weight: bolder;
+    position: relative;
+    width: 100%;
+    transition: 0.5s;
+    padding: 0px;
+    height: 1.6em;
+
+  }
+
+  input[type=color],
+  input[type=button],
+  select {
+    width: 75%;
+    height: 1.6em;
+  }
+
+  input:hover {
+    transition: 0.5s;
+    border: 2px brown solid;
+  }
+
+  input:focus {
+    background-color: yellow;
+  }
+
+  label {
+    height: 2em;
+
+  }
+
+  h3 {
+    margin-top: 2px;
+  }
+
+  section {
+    border-radius: 1em;
+    border: 3px solid #C14953;
+    background-color: #30292F;
+    padding: 1em;
+    margin: 2px;
+  }
+
+  a,
+  button {
+    color: #376DAB;
+    border: solid 0.2em gray;
+    padding: 0.5em;
+    margin: 0.25em;
+    border-radius: 0.5em;
+    background-color: gainsboro;
+    transition: 0.25s;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family: monospace;
+    font-weight: bolder;
+  }
+
+  a:hover{
+    color: #4b91e0;
+    background-color: lightgray;
+    transition: 0.25s;
+  }
+
+  a:active {
+    background-color: yellow;
+    transition: 0.25s;
+
+  }
+</style>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+</head>
+
+<body>
+  <div id="forma"  style="left: 25%; position: absolute; width: 50%;">
+    <h1 style="margin-bottom: 0px;">
+      Digitalni sat
+    </h1>
+    <h3 style="margin-top: 0px;">(Završni rad Niko Pešut)</h3>
+    <section style="background-color:rgba(128, 128, 128, 0.2); border-color: gray;">
+        <h3>Stisni da bi dobio/la lokaciju</h3>
+      <a onclick="getLocation()">Stisni me</a>
+      <div id="izlaz"></div>
+    </section>
+    </div>
+  </div>
+
+  <script>
+    var x = document.getElementById("izlaz");
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        x.innerHTML = "Geolokacija nije podržana u ovom pregledniku!";
+      }
+    }
+
+    function showPosition(position) {
+      x.innerHTML = "<h3><br> Geografska Širina: <input type=\"text\" value=\"" + position.coords.latitude +
+        "\" id=\"sirina\"><br>Geografska Dužina: <input type=\"text\" value=\"" + position.coords.longitude + "\" id=\"duzina\"><br><br>Sada te podatke prekopiraj u lokalni form/obrazac.</h3>";
+      x.innerHTML += "Kopiraj klikom:<br><br><a onclick=\"gsir()\">Geografska Širina</a><a onclick=\"gduz()\">Geografska Dužina</a>";
+    }
+    function gduz() {
+      var copyText = document.getElementById("duzina");
+      copyText.select();
+      copyText.setSelectionRange(0, 99999); 
+      navigator.clipboard.writeText(copyText.value);
+    }
+    function gsir() {
+      var copyText = document.getElementById("sirina");
+      copyText.select();
+      copyText.setSelectionRange(0, 99999); 
+      navigator.clipboard.writeText(copyText.value);
+    }
+  </script>
+
+</body>
+
+</html>
