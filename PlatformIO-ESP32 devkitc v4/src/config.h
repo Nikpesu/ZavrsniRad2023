@@ -6,7 +6,6 @@
 #include <MatrixHardware_ESP32_V0.h>
 #include <SmartMatrix.h>
 #include <WiFi.h>
-#include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include "SPIFFS.h"
 #include "NetCrtESP.h"
@@ -17,6 +16,7 @@
 #include <TaskManagerIO.h>
 #include <ADS1115.h>
 //#include <TimeLib.h>
+//#include <AsyncTCP.h>
 //#include <Timezone.h>
 //#include "ESPTimeFunc.h"
 //#include "time.h"

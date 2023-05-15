@@ -1,0 +1,226 @@
+#ifndef GLOBAL_H
+#define GLOBAL_H
+
+#include <HTTPClient.h>
+#include <MatrixHardware_ESP32_V0.h>
+#include <SmartMatrix.h>
+#include <WiFi.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include "SPIFFS.h"
+#include "NetCrtESP.h"
+#include <RTClib.h>
+#include <Wire.h>
+#include <cstring>
+#include <ArduinoJson.h> 
+#include <TaskManagerIO.h>
+#include <ADS1115.h>
+//#include <TimeLib.h>
+//#include <Timezone.h>
+//#include "ESPTimeFunc.h"
+//#include "time.h"
+//#include "ssdpAWS.h"
+
+/************************JSON_Variables******************/
+String filePath = "/myConf.json"; //File for config
+String jsonConfig = "{}";
+String SSID="", PASS="";
+uint8_t stateID=4; 
+//String mqttPass = "";
+//String mqttUsername = "";
+//String mqttIP = "";
+String APssid = "SatZavrsniNiko";
+String APpass = "";
+uint8_t boja1[3]={255,255,255},boja2[3]={128,64,128},boja3[3]={64,64,128}, svjetlina=128; 
+float lat=0, lng=0;
+String timeApiKey="x"; //MCD644HWLRP5
+String weatherApiKey="x"; //2f940c078e7a96ecf846d11bba2cbdc7
+
+/************************Gumbi***************************/
+ADS1115 adc0(ADS1115_DEFAULT_ADDRESS);
+
+/****************Serijska Komunikacija*******************/
+const int I2C_SDA=0,I2C_SCL=13; 
+
+/**********************RTC & sat*************************/
+RTC_DS3231 rtc;
+String daysOfTheWeek[7] = {"NED","PON","UTO","SRI","CET","PET","SUB"};
+uint32_t epochNow=0; 
+bool tocke=true;
+//ESPTimeFunc myESPTime(false);
+float vrijemeIzlaska=1671261493%86400/60.0/60, vrijemeZalaska=1671301493%86400/60.0/60;
+int minuta, sekunda, sat;
+
+/***************************WIFI*************************/
+NetCrtESP myWIFI;
+AsyncWebServer HTTP(80);  
+//ssdpAWS mySSDP(&HTTP);
+
+String SSDP_Name = "sussyESP"; 
+const String nName = "NikoSat"; 
+const String nVersion = "v0.6.1";
+
+
+/*********************DISPLAY setup**********************/
+#define COLOR_DEPTH 24    
+const uint16_t kMatrixWidth = 64;      
+const uint16_t kMatrixHeight = 32; 
+const uint8_t kRefreshDepth = 36; 
+const uint8_t kDmaBufferRows = 4;
+const uint8_t kPanelType = SM_PANELTYPE_HUB75_32ROW_MOD16SCAN;
+const uint32_t kMatrixOptions = (SM_HUB75_OPTIONS_NONE);
+const uint8_t kBackgroundLayerOptions = (SM_BACKGROUND_OPTIONS_NONE);
+const uint8_t kScrollingLayerOptions = (SM_SCROLLING_OPTIONS_NONE);
+const uint8_t kIndexedLayerOptions = (SM_INDEXED_OPTIONS_NONE);
+
+SMARTMATRIX_ALLOCATE_BUFFERS(matrix, kMatrixWidth, kMatrixHeight, kRefreshDepth, kDmaBufferRows, kPanelType, kMatrixOptions);
+SMARTMATRIX_ALLOCATE_BACKGROUND_LAYER(backgroundLayer, kMatrixWidth, kMatrixHeight, COLOR_DEPTH, kBackgroundLayerOptions);
+SMARTMATRIX_ALLOCATE_INDEXED_LAYER(indexedLayerZ1, kMatrixWidth, kMatrixHeight, COLOR_DEPTH, kIndexedLayerOptions);
+SMARTMATRIX_ALLOCATE_INDEXED_LAYER(indexedLayerZ2, kMatrixWidth, kMatrixHeight, COLOR_DEPTH, kIndexedLayerOptions);
+
+//const int defaultBrightness = (100*255)/100;        // full (100%) brightness
+//const int defaultBrightness = (15*255)/100;       // dim: 15% brightness
+const int defaultBrightness = (20*255)/100;       // dim: 15% brightness
+const int defaultScrollOffset = 0;
+const rgb24 defaultBackgroundColor = {0x40, 0, 0};
+#define BLACK   0x0000
+#define BLUE    0x001F 
+#define RED     0xF800
+#define GREEN   0x07E0
+#define CYAN    0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW  0xFFE0
+#define WHITE   0xFFFF
+
+/******************DISPLAY.h varijable*******************/
+int dan=0, noc=0;
+bool gumbStanje=0, saveStanje=0;
+uint8_t zadnje_stisnuto=0;
+String statusTrenutno;
+int statusTrenutniPomak=kMatrixWidth;
+
+/********************HTTP.h varijable*******************/
+float tempCurr=0;
+float humCurr=0; 
+float windCurr=0; 
+int pressCurr=0; 
+int visibilityCurr=0; 
+int skyCurr=0;
+
+/************************* JSON ************************/
+bool loadConfig();
+bool saveConfig();
+
+bool loadConfig() {
+  Serial.println("-----");
+  Serial.println("Load!");
+  Serial.println("-----");
+    if(!SPIFFS.exists(filePath)) {
+        Serial.println(F("Failed to open config file"));
+        saveConfig();   
+        return false;
+    }
+    File configFile = SPIFFS.open(filePath, "r");   
+    size_t size = configFile.size();   
+    if (size > 2048) {  
+        Serial.print(F("Config file size is too large: ")); Serial.println(size);
+        configFile.close();
+        return false;
+    }
+    jsonConfig = configFile.readString(); 
+    configFile.close();
+    DynamicJsonDocument jsonDoc(5096); //4096
+    DeserializationError error = deserializeJson(jsonDoc, jsonConfig);
+    if (error) {
+      Serial.print(F("loadConfig() deserializeJson() failed with code "));
+      Serial.println(error.c_str());
+      return false;
+    }   
+    JsonObject root = jsonDoc.as<JsonObject>();   
+
+    //network
+    SSID = root["SSID"].as<String>();
+    PASS = root["PASS"].as<String>();
+    
+    APssid = root["APssid"].as<String>();
+    APpass = root["APpass"].as<String>();
+    //mqttPass = root["mqttPass"].as<String>();
+    //mqttUsername = root["mqttUsername"].as<String>();
+    //mqttIP = root["mqttIP"].as<String>();
+
+    //display
+    stateID = root["stateID"];
+    boja1[0] = root["color1Red"] ; boja1[1] = root["color1Green"]; boja1[2] = root["color1Blue"];
+    boja2[0] = root["color2Red"] ; boja2[1] = root["color2Green"]; boja2[2] = root["color2Blue"];
+    boja3[0] = root["color3Red"] ; boja3[1] = root["color3Green"]; boja3[2] = root["color3Blue"];
+    svjetlina = root["lightIntensity"].as<uint8_t>();
+
+    //lokacija
+    lat=root["latitude"].as<float>();
+    lng=root["longitude"].as<float>();
+
+    //api-s
+    weatherApiKey = root["weatherApiKey"].as<String>();
+    timeApiKey = root["timeApiKey"].as<String>();
+
+    return true;
+}
+
+bool saveConfig() {
+  Serial.println("-----");
+  Serial.println("Save!");
+  Serial.println("-----");
+    DynamicJsonDocument jsonDoc(5096); //4096
+    DeserializationError error = deserializeJson(jsonDoc, jsonConfig);
+    if (error) {
+        Serial.print(F("saveConfig() deserializeJson() failed with code "));
+        Serial.println(error.c_str());
+        return false;
+    }     
+    JsonObject json = jsonDoc.as<JsonObject>();  
+   
+      
+    //network mqttUsername mqttIP mqttPass
+    json["SSID"] = SSID;
+    json["PASS"] = PASS;
+    json["APssid"] = APssid;
+    json["APpass"] = APpass;
+    //json["mqttPass"] = mqttPass;
+    //json["mqttUsername"] = mqttUsername;
+    //json["mqttIP"] = mqttIP;
+    
+    //display
+    json["stateID"] = stateID;
+    json["color1Red"] = boja1[0]; json["color1Green"] = boja1[1]; json["color1Blue"] = boja1[2];
+    json["color2Red"] = boja2[0]; json["color2Green"] = boja2[1]; json["color2Blue"] = boja2[2];
+    json["color3Red"] = boja3[0]; json["color3Green"] = boja3[1]; json["color3Blue"] = boja3[2];
+    json["lightIntensity"] = svjetlina;
+
+    //lokacija
+    json["latitude"]=lat;
+    json["longitude"]=lng;
+
+    //api-s
+    json["weatherApiKey"] = weatherApiKey;
+    json["timeApiKey"] = timeApiKey;
+
+    serializeJson(json, jsonConfig);
+    File configFile = SPIFFS.open(filePath, "w");
+    if (!configFile) {
+        Serial.println(F("Failed to open config file for writing"));
+        configFile.close();
+        return false;
+    }
+    serializeJson(json, configFile);
+    serializeJson(json, Serial);
+    configFile.close();
+    return true;
+}
+
+
+/*************************Podatci************************/
+
+bool brojke[60][13]={{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,0,0,0,0,0,0,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,1,1,1,1},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{1,1,0,0,0,0,0,0,0,0},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,0,0,1,1,1,1,1,1},{1,1,0,0,1,1,1,1,1,1},{1,1,0,0,1,1,0,0,1,1},{1,1,1,1,1,1,0,0,1,1},{1,1,1,1,1,1,0,0,1,1},{1,1,0,0,1,1,0,0,1,1},{1,1,0,0,1,1,0,0,1,1},{1,1,0,0,1,1,0,0,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,0,0,0,0},{1,1,1,1,1,1,0,0,0,0},{0,0,0,0,1,1,0,0,0,0},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,0,0,1,1},{1,1,1,1,1,1,0,0,1,1},{1,1,0,0,1,1,0,0,1,1},{1,1,0,0,1,1,1,1,1,1},{1,1,0,0,1,1,1,1,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,0,0,1,1,0,0,1,1},{1,1,0,0,1,1,1,1,1,1},{1,1,0,0,1,1,1,1,1,1},{1,1,1,1,0,0,0,0,0,0},{1,1,1,1,0,0,0,0,0,0},{1,1,0,0,0,0,0,0,0,0},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,0,0,1,1,0,0,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,0,0,1,1},{1,1,1,1,1,1,0,0,1,1},{1,1,0,0,1,1,0,0,1,1},{1,1,1,1,1,1,1,1,1,1},{1,1,1,1,1,1,1,1,1,1},{0,0,0,0,0,0,0,0,0,0},{0,0,1,1,0,0,1,1,0,0},{0,0,1,1,0,0,1,1,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,1,1,0,0,1,1,0,0},{0,0,1,1,0,0,1,1,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+bool miniLetters[285][5]={{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{1,1,1,0,1},{0,0,0,0,0},{1,1,0,0,0},{0,0,0,0,0},{1,1,0,0,0},{1,1,1,1,1},{0,1,0,1,0},{1,1,1,1,1},{1,1,1,0,1},{1,1,1,1,1},{1,0,1,1,1},{1,0,0,1,1},{0,0,1,0,0},{1,1,0,0,1},{0,1,0,1,0},{1,0,1,0,1},{0,1,0,1,1},{0,0,0,0,0},{1,1,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,1,1,1,0},{1,0,0,0,1},{1,0,0,0,1},{0,1,1,1,0},{0,0,0,0,0},{1,1,1,0,0},{1,0,1,0,0},{1,1,1,0,0},{0,0,1,0,0},{0,1,1,1,0},{0,0,1,0,0},{0,0,0,0,0},{0,1,0,0,0},{1,0,0,0,0},{0,0,1,0,0},{0,0,1,0,0},{0,0,1,0,0},{0,0,0,0,0},{0,0,0,0,1},{0,0,0,0,0},{0,0,0,1,1},{0,1,1,1,0},{1,1,0,0,0},{1,1,1,1,1},{1,0,0,0,1},{1,1,1,1,1},{0,0,0,0,0},{0,1,0,0,0},{1,1,1,1,1},{1,0,1,1,1},{1,0,1,0,1},{1,1,1,0,1},{1,0,1,0,1},{1,0,1,0,1},{1,1,1,1,1},{1,1,1,0,0},{0,0,1,0,0},{1,1,1,1,1},{1,1,1,0,1},{1,0,1,0,1},{1,0,1,1,1},{1,1,1,1,1},{1,0,1,0,1},{1,0,1,1,1},{1,0,0,0,0},{1,0,0,0,0},{1,1,1,1,1},{1,1,1,1,1},{1,0,1,0,1},{1,1,1,1,1},{1,1,1,0,1},{1,0,1,0,1},{1,1,1,1,1},{0,0,0,0,0},{0,1,0,1,0},{0,0,0,0,0},{0,0,0,0,1},{0,1,0,1,0},{0,0,0,0,0},{0,0,1,0,0},{0,1,0,1,0},{1,0,0,0,1},{0,1,0,1,0},{0,1,0,1,0},{0,1,0,1,0},{1,0,0,0,1},{0,1,0,1,0},{0,0,1,0,0},{1,0,0,0,0},{1,0,1,0,1},{1,1,1,0,0},{0,1,0,1,1},{1,0,1,0,1},{1,1,1,0,1},{1,1,1,1,1},{1,0,1,0,0},{1,1,1,1,1},{1,1,1,1,1},{1,0,1,0,1},{0,1,0,1,0},{0,1,1,1,0},{1,0,0,0,1},{1,0,0,0,1},{1,1,1,1,1},{1,0,0,0,1},{0,1,1,1,0},{1,1,1,1,1},{1,0,1,0,1},{1,0,1,0,1},{1,1,1,1,1},{1,0,1,0,0},{1,0,1,0,0},{0,1,1,1,0},{1,0,0,0,1},{1,0,1,1,1},{1,1,1,1,1},{0,0,1,0,0},{1,1,1,1,1},{1,0,0,0,1},{1,1,1,1,1},{1,0,0,0,1},{0,0,0,1,1},{0,0,0,0,1},{1,1,1,1,1},{1,1,1,1,1},{0,0,1,0,0},{1,1,0,1,1},{1,1,1,1,1},{0,0,0,0,1},{0,0,0,0,1},{1,1,1,1,1},{0,1,0,0,0},{1,1,1,1,1},{1,1,1,1,1},{1,0,0,0,0},{1,1,1,1,1},{1,1,1,1,1},{1,0,0,0,1},{1,1,1,1,1},{1,1,1,1,1},{1,0,1,0,0},{1,1,1,0,0},{1,1,1,1,1},{1,1,1,1,1},{0,0,0,0,1},{1,1,1,1,1},{1,0,1,1,0},{1,1,1,0,1},{1,1,1,0,1},{1,0,1,0,1},{1,0,1,1,1},{1,0,0,0,0},{1,1,1,1,1},{1,0,0,0,0},{1,1,1,1,1},{0,0,0,0,1},{1,1,1,1,1},{1,1,1,1,1},{0,0,0,1,1},{1,1,1,1,0},{1,1,1,1,1},{0,0,0,1,0},{1,1,1,1,1},{1,1,0,1,1},{0,0,1,0,0},{1,1,0,1,1},{1,1,1,0,0},{0,0,1,1,1},{1,1,1,0,0},{1,0,0,1,1},{1,0,1,0,1},{1,1,0,0,1},{0,0,0,0,0},{1,1,1,1,1},{1,0,0,0,1},{1,1,0,0,0},{0,1,1,1,0},{0,0,0,1,1},{1,0,0,0,1},{1,1,1,1,1},{0,0,0,0,0},{0,1,0,0,0},{1,0,0,0,0},{0,1,0,0,0},{0,0,0,0,1},{0,0,0,0,1},{0,0,0,0,1},{0,0,0,0,0},{1,0,0,0,0},{0,1,0,0,0},{1,1,1,1,1},{1,0,1,0,0},{1,1,1,1,1},{1,1,1,1,1},{1,0,1,0,1},{0,1,0,1,0},{0,1,1,1,0},{1,0,0,0,1},{1,0,0,0,1},{1,1,1,1,1},{1,0,0,0,1},{0,1,1,1,0},{1,1,1,1,1},{1,0,1,0,1},{1,0,1,0,1},{1,1,1,1,1},{1,0,1,0,0},{1,0,1,0,0},{0,1,1,1,0},{1,0,0,0,1},{1,0,1,1,1},{1,1,1,1,1},{0,0,1,0,0},{1,1,1,1,1},{1,0,0,0,1},{1,1,1,1,1},{1,0,0,0,1},{0,0,0,1,1},{0,0,0,0,1},{1,1,1,1,1},{1,1,1,1,1},{0,0,1,0,0},{1,1,0,1,1},{1,1,1,1,1},{0,0,0,0,1},{0,0,0,0,1},{1,1,1,1,1},{0,1,0,0,0},{1,1,1,1,1},{1,1,1,1,1},{1,0,0,0,0},{1,1,1,1,1},{1,1,1,1,1},{1,0,0,0,1},{1,1,1,1,1},{1,1,1,1,1},{1,0,1,0,0},{1,1,1,0,0},{1,1,1,1,1},{1,1,1,1,1},{0,0,0,0,1},{1,1,1,1,1},{1,0,1,1,0},{1,1,1,0,1},{1,1,1,0,1},{1,0,1,0,1},{1,0,1,1,1},{1,0,0,0,0},{1,1,1,1,1},{1,0,0,0,0},{1,1,1,1,1},{0,0,0,0,1},{1,1,1,1,1},{1,1,1,1,1},{0,0,0,1,1},{1,1,1,1,0},{1,1,1,1,1},{0,0,0,1,0},{1,1,1,1,1},{1,1,0,1,1},{0,0,1,0,0},{1,1,0,1,1},{1,1,1,0,0},{0,0,1,1,1},{1,1,1,0,0},{1,0,0,1,1},{1,0,1,0,1},{1,1,0,0,1},{0,0,1,0,0},{1,1,1,1,1},{1,0,0,0,1},{0,0,0,0,0},{1,1,1,1,1},{0,0,0,0,0},{1,0,0,0,1},{1,1,1,1,1},{0,0,1,0,0},{0,0,1,0,0},{0,1,1,0,0},{0,0,0,0,0}};
+
+#endif

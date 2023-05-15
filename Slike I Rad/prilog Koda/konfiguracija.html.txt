@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<style>
+  html {
+    background-color: #DBDBDB;
+    color: #376DAB;
+    font-family: monospace;
+    font-weight: bolder;
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid #C14953;
+  }
+
+  input,
+  select {
+    height: 1.5em;
+    padding: auto;
+    margin: 0.1em;
+    color: #376DAB;
+    font-family: monospace;
+    background-color: #EE635240;
+    border: 2px transparent solid;
+    border-radius: 0.2em;
+    font-weight: bolder;
+    position: relative;
+    width: 100%;
+    transition: 0.5s;
+    padding: 0px;
+    height: 1.6em;
+
+  }
+
+  input[type=color],
+  input[type=button],
+  select {
+    width: 75%;
+    height: 1.6em;
+  }
+
+  input:hover {
+    transition: 0.5s;
+    border: 2px brown solid;
+  }
+
+  input:focus {
+    background-color: yellow;
+  }
+
+  label {
+    height: 2em;
+
+  }
+
+  h3 {
+    margin-top: 2px;
+  }
+
+  section {
+    border-radius: 1em;
+    border: 3px solid #C14953;
+    background-color: #30292F;
+    padding: 1em;
+    margin: 2px;
+  }
+
+  a {
+    color: #376DAB;
+  }
+</style>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+</head>
+
+<body>
+
+  <form id="forma" action="/get" method="get" style="left: 25%; position: absolute; width: 50%;">
+
+    <div style="display: flex; flex-direction: column;">
+
+      <h1 style="margin-bottom: 0px;">
+        Digitalni sat
+      </h1>
+      <h3 style="margin-top: 0px;">(Završni rad Niko Pešut)</h3>
+      <section style="background-color:rgba(128, 128, 128, 0.2); border-color: gray;">
+        <h3 style="margin: 0px;">Stavke koje ne mijenjate se neće postaviti</h3>
+      </section>
+      <section>
+        <h2 style="margin-bottom: 2px; ">Lokacija</h2>
+        <h5 style="margin-top: 2px;">(od lokacije se automatski uzima vremenska zona, datum, vrijeme...)</h1>
+          <a href="https://geoloc.pesut.win" target="_blank"><input type="button"  value="dobij lokaciju"></a><br>
+          <label for="latitude">Geografska Širina</label>
+          <input type="text" id="latitude" name="latitude"><br>
+          <label for="longitude">Geografska Dužina</label>
+          <input type="text" id="longitude" name="longitude"><br>
+
+          <input type="hidden" id="longitudechange" name="longitudechange" value="0">
+          <input type="hidden" id="latitudechange" name="latitudechange" value="0">
+      </section>
+      <section>
+        <h2>Boje i stil</h2>
+        <label for="boja1">1. boja</label><br>
+        <input type="color" value="#ffffff" name="boja1" id="boja1"><br>
+        <label for="boja2">2. boja</label><br>
+        <input type="color" value="#ffffff" name="boja2" id="boja2"><br>
+        <label for="boja3">3. boja</label><br>
+        <input type="color" value="#ffffff" name="boja3" id="boja3"><br>
+        <label for="mod">Modovi</label><br>
+        <select name="mod" id="mod">
+          <option value="0" disabled selected>-- Odaberi mod --</option>
+          <option value="4">Sat, crta dana, trenutačno vrijeme i wifi status</option>
+          <option value="1">Sat, crta dana i trenutačno vrijeme</option>
+          <option value="2">Sat, crta dana i datum</option>
+          <option value="3">Sat i datum</option>
+        </select>
+
+        <input type="hidden" id="boja1change" name="boja1change" value="0">
+        <input type="hidden" id="boja2change" name="boja2change" value="0">
+        <input type="hidden" id="boja3change" name="boja3change" value="0">
+        <input type="hidden" id="modchange" name="modchange" value="0">
+      </section>
+      <section id="mreza">
+        <h2>Mreža</h2>
+        <label for="SSID">WiFi SSID</label>
+        <input id="SSID" name="SSID" type="text" placeholder="Ime WIFI-a"><br>
+        <label for="PASSWORD">WiFi Šifra</label>
+        <input id="PASSWORD" name="PASSWORD" type="text" placeholder="Šifra WIFI-a"><br>
+        <label for="APSSID">HotSpot SSID</label>
+        <input id="APSSID" name="APSSID" type="text" placeholder="Ime accespoint-a"><br>
+        <label for="APPASSWORD">HotSpot Šifra</label>
+        <input id="APPASSWORD" name="APPASSWORD" type="text" placeholder="Šifra accespoint-a"><br>
+
+        <input type="hidden" id="SSIDchange" name="SSIDchange" value="0">
+        <input type="hidden" id="PASSWORDchange" name="PASSWORDchange" value="0">
+        <input type="hidden" id="APSSIDchange" name="APSSIDchange" value="0">
+        <input type="hidden" id="APPASSWORDchange" name="APPASSWORDchange" value="0">
+      </section>
+      <section>
+        <h2>API-s</h2>
+        <label for="timezonedb"><a href="https://www.timezonedb.com">Timezonedb</a> api ključ</label>
+        <input id="timezonedb" name="timezonedb" type="text" placeholder="Api Key"><br>
+        <label for="openweathermap"><a href="https://www.openweathermap.org">Openweathermap</a> api ključ</label>
+        <input id="openweathermap" name="openweathermap" type="text" placeholder="Api Key"><br>
+
+        <input type="hidden" id="timezonedbchange" name="timezonedbchange" value="0">
+        <input type="hidden" id="openweathermapchange" name="openweathermapchange" value="0">
+      </section>
+      <input type="submit" id="posaljitelj" type="button" value="Pošalji" style="height: 3em; font-size: 2em; width: 99%;">
+    </div>
+  </form>
+</body>
+<script>
+  document.getElementById("boja1change").value = "0";
+  document.getElementById("boja2change").value = "0";
+  document.getElementById("boja3change").value = "0";
+  document.getElementById("latitudechange").value = "0";
+  document.getElementById("longitudechange").value = "0";
+  document.getElementById("SSIDchange").value = "0";
+  document.getElementById("PASSWORDchange").value = "0";
+  document.getElementById("APSSIDchange").value = "0";
+  document.getElementById("APPASSWORDchange").value = "0";
+  document.getElementById("timezonedbchange").value = "0";
+  document.getElementById("openweathermapchange").value = "0";
+  document.getElementById("modchange").value = "0";
+  document.getElementById("boja1").addEventListener("change", (event) => { document.getElementById("boja1change").value = "1"; });
+  document.getElementById("boja2").addEventListener("change", (event) => { document.getElementById("boja2change").value = "1"; });
+  document.getElementById("boja3").addEventListener("change", (event) => { document.getElementById("boja3change").value = "1"; });
+  document.getElementById("latitude").addEventListener("change", (event) => { document.getElementById("latitudechange").value = "1"; });
+  document.getElementById("longitude").addEventListener("change", (event) => { document.getElementById("longitudechange").value = "1"; });
+  document.getElementById("SSID").addEventListener("change", (event) => { document.getElementById("SSIDchange").value = "1"; });
+  document.getElementById("PASSWORD").addEventListener("change", (event) => { document.getElementById("PASSWORDchange").value = "1"; });
+  document.getElementById("APSSID").addEventListener("change", (event) => { document.getElementById("APSSIDchange").value = "1"; });
+  document.getElementById("APPASSWORD").addEventListener("change", (event) => { document.getElementById("APPASSWORDchange").value = "1"; });
+  document.getElementById("timezonedb").addEventListener("change", (event) => { document.getElementById("timezonedbchange").value = "1"; });
+  document.getElementById("openweathermap").addEventListener("change", (event) => { document.getElementById("openweathermapchange").value = "1"; });
+  document.getElementById("mod").addEventListener("change", (event) => { document.getElementById("modchange").value = "1"; });
+
+  let form = document.getElementById("forma");
+  let button = document.getElementById("get-location");
+  let latText = document.getElementById("latitude");
+  let longText = document.getElementById("longitude");
+  document.getElementById("get-location").addEventListener("click", (event) => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      let lat = position.coords.latitude;
+      let long = position.coords.longitude;
+
+      latText.value = lat.toFixed(2);
+      longText.value = long.toFixed(2);
+    }
+    );
+  }
+  );
+
+  document.getElementById("posaljitelj").addEventListener("click", (event) => {
+    form.submit();
+  }
+  );
+
+</script>
+</html>
